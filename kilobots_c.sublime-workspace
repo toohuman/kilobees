@@ -1,0 +1,614 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"message",
+				"message_stats"
+			],
+			[
+				"populat",
+				"populationOpinions"
+			],
+			[
+				"opinions",
+				"populationOpinions"
+			],
+			[
+				"uint_",
+				"uint8_t"
+			],
+			[
+				"pair",
+				"pairInconsistencyResults"
+			],
+			[
+				"incon",
+				"inconsistResults"
+			],
+			[
+				"incons",
+				"inconsistency"
+			],
+			[
+				"ortho",
+				"orthogDist"
+			],
+			[
+				"orth",
+				"orthogDistResults"
+			],
+			[
+				"lineSe",
+				"lineSegmentY"
+			],
+			[
+				"lower",
+				"lower_beliefs_end"
+			],
+			[
+				"upper",
+				"upperBeliefResults"
+			],
+			[
+				"thresh",
+				"thresholds"
+			],
+			[
+				"lower_",
+				"lower_beliefs"
+			],
+			[
+				"unique",
+				"uniqueBeliefs"
+			],
+			[
+				"round",
+				"rounded_totals"
+			],
+			[
+				"upp",
+				"upper_beliefs"
+			],
+			[
+				"aget",
+				"agentIndex"
+			],
+			[
+				"world",
+				"worldBeliefs"
+			],
+			[
+				"val",
+				"value_count"
+			],
+			[
+				"line",
+				"line_count"
+			],
+			[
+				"bel",
+				"beliefPairs"
+			],
+			[
+				"pro",
+				"propositions"
+			],
+			[
+				"resul",
+				"results_set"
+			],
+			[
+				"dist",
+				"distanceCount"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "Makefile",
+			"settings":
+			{
+				"buffer_size": 3132,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "blank.c",
+			"settings":
+			{
+				"buffer_size": 11649,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 174.0,
+		"last_filter": "install",
+		"selected_items":
+		[
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"remove pa",
+				"Package Control: Remove Package"
+			],
+			[
+				"install pac",
+				"Package Control: Install Package"
+			],
+			[
+				"remove",
+				"Package Control: Remove Package"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"instaa",
+				"Package Control: Install Package"
+			],
+			[
+				":f",
+				":$ - EOF"
+			],
+			[
+				":w",
+				":w - Save"
+			],
+			[
+				":W",
+				":w - Save"
+			]
+		],
+		"width": 431.0
+	},
+	"console":
+	{
+		"height": 139.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = 'eb2297e1a458f27d836c04bb0cbaf282' + 'd0e7a3098092775ccb37ca9d6b2e4b7d'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)",
+			"import urllib.request,os,hashlib; h = '7183a2d3e96f11eeadd761d777e62404' + 'e330c659d4bb41d3bdf022e94cab3cd0'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/home/michael/Dropbox/Workspace/phd/projects/kilobots/kilolib"
+	],
+	"file_history":
+	[
+		"/media/michael/ESD-USB/kilobots/brl_code/blank.c",
+		"/home/michael/Dropbox/Workspace/phd/projects/kilobots/kilolib/kilolib.c",
+		"/home/michael/Dropbox/Workspace/phd/projects/kilobots/kilolib/blank.c",
+		"/home/michael/Dropbox/Workspace/phd/projects/kilobots/kilobox/Box2D/Testbed/Tests/kiloworld.cpp",
+		"/home/michael/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
+		"/home/michael/Dropbox/Preferences_.sublime-settings",
+		"/home/michael/Dropbox/Workspace/phd/projects/kilobots/kilobox/worlds/test_swarm_0.00.world",
+		"/home/michael/Dropbox/Workspace/phd/projects/kilobots/kilobox/worlds/test_swarm_0.05.world",
+		"/home/michael/Dropbox/Workspace/phd/projects/kilobots/kilobox/worlds/test_swarm_0.10.world",
+		"/home/michael/Dropbox/Workspace/phd/projects/kilobots/kilobox/worlds/test_swarm_0.15.world",
+		"/home/michael/Dropbox/Workspace/phd/projects/kilobots/kilobox/worlds/test_swarm_0.20.world",
+		"/home/michael/Dropbox/Workspace/phd/projects/kilobots/kilobox/worlds/test_swarm_0.25.world",
+		"/home/michael/Dropbox/Workspace/phd/projects/kilobots/kilobox/worlds/test_swarm_0.30.world",
+		"/home/michael/Dropbox/Workspace/phd/projects/kilobots/kilobox/worlds/test_swarm_0.35.world",
+		"/home/michael/Dropbox/Workspace/phd/projects/kilobots/kilobox/worlds/test_swarm_0.40.world",
+		"/home/michael/Dropbox/Workspace/phd/projects/kilobots/kilobox/worlds/test_swarm_0.45.world",
+		"/home/michael/Dropbox/Workspace/phd/projects/kilobots/kilobox/worlds/test_swarm_0.50.world",
+		"/home/michael/Dropbox/Workspace/phd/projects/kilobots/kilobox/worlds/test_swarm_0.55.world",
+		"/home/michael/Dropbox/Workspace/phd/projects/kilobots/kilobox/worlds/test_swarm_0.60.world",
+		"/home/michael/Dropbox/Workspace/phd/projects/kilobots/kilobox/worlds/test_swarm_0.65.world",
+		"/home/michael/Dropbox/Workspace/phd/projects/kilobots/kilobox/worlds/test_swarm_0.70.world",
+		"/home/michael/Dropbox/Workspace/phd/projects/kilobots/kilobox/worlds/test_swarm_0.90.world",
+		"/home/michael/Dropbox/Workspace/phd/projects/kilobots/kilobox/worlds/test_swarm_0.95.world",
+		"/home/michael/Dropbox/Workspace/phd/projects/kilobots/kilobox/worlds/test_swarm_1.00.world",
+		"/home/michael/Dropbox/Workspace/phd/projects/kilobots/kilobox/worlds/test_swarm_0.75.world",
+		"/home/michael/Dropbox/Workspace/phd/projects/kilobots/kilobox/worlds/test_swarm_0.80.world",
+		"/home/michael/Dropbox/Workspace/phd/projects/kilobots/kilobox/worlds/test_swarm_0.85.world",
+		"/home/michael/Dropbox/Documents/Bristol/marking/EMAT10006_marking/CWK-C_2016/feedback_edits/22919/feedback.txt",
+		"/home/michael/Dropbox/Workspace/phd/projects/kilobots/kilobox/worlds/test_forage.world",
+		"/home/michael/Dropbox/Workspace/phd/projects/kilobots/kilobox/worlds/test_forage_default.world",
+		"/home/michael/Dropbox/Workspace/phd/projects/kilobots/kilobox/Box2D/Testbed/Tests/worldfile.cpp",
+		"/home/michael/idea-IU-145.258.11/Install-Linux-tar.txt",
+		"/home/michael/Dropbox/Workspace/aiama/aima-java/.gitignore",
+		"/home/michael/idea-IU/Install-Linux-tar.txt",
+		"/home/michael/Dropbox/Documents/University/cardiff/projects/year 3/ai/MinimaxGhostAlphaBeta.java",
+		"/home/michael/Dropbox/Documents/University/cardiff/projects/year 3/ai/cw/pacman/MyGhostPlayer.java",
+		"/home/michael/Dropbox/Documents/University/cardiff/projects/year 3/ai/cw/pacman/MyGhostPlayer2.java",
+		"/home/michael/.cache/.fr-fyTcqa/idea-IU-143.2287.1/Install-Linux-tar.txt",
+		"/home/michael/.cache/.fr-K4bLDE/idea-IU-143.2287.1/build.txt",
+		"/home/michael/Dropbox/Workspace/aiama/java/aima-core/src/main/java/aima/core/probability/bayes/BayesianNetwork.java",
+		"/home/michael/Dropbox/Workspace/aiama/java/aima-core/src/main/java/aima/core/probability/bayes/BayesInference.java",
+		"/home/michael/Dropbox/Workspace/aiama/java/aima-core/src/main/java/aima/core/probability/bayes/ConditionalProbabilityDistribution.java",
+		"/home/michael/Dropbox/Workspace/aiama/java/aima-core/src/main/java/aima/core/probability/bayes/ConditionalProbabilityTable.java",
+		"/home/michael/Dropbox/Workspace/aiama/java/aima-java/src/aima/logic/propositional/algorithms/Model.java",
+		"/home/michael/Dropbox/Workspace/aiama/java/aima-java/src/aima/logic/propositional/parsing/ast/Sentence.java",
+		"/home/michael/xorg.conf.new",
+		"/home/michael/.bash_history",
+		"/home/michael/.xinitrc",
+		"/home/michael/Dropbox/Workspace/c/src/stack.c",
+		"/home/michael/Dropbox/Workspace/c/src/undcl.c",
+		"/home/michael/Dropbox/Workspace/c/src/occurrence.c",
+		"/home/michael/Dropbox/Workspace/c/src/ptr_practice.c",
+		"/home/michael/Dropbox/Workspace/c/src/CMakeLists.txt",
+		"/home/michael/Dropbox/Workspace/c/src/catoi.c",
+		"/home/michael/Dropbox/Workspace/cpp/RayCaster/RayCaster/RayCaster.cpp",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/uncertainty/world_group.d",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/results/group_comparisons_u.py",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/results/plot_belief_measures_u_quiver.py",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/results/plot_bool_vs_three_traj_u.py",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/results/group_comparisons_three_vs_bool.py",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/results/group_comparisons_plus.py",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/results/plot_bool_vs_three_u_histogram.py",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/results/plot_bool_vs_three_u.py",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/uncertainty/world.d",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/uncertainty/genetics/genetics.d",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/uncertainty/genetics/symmetric.d",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/uncertainty/consensus/operators.d",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/uncertainty/ai/agent.d",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/results/plot_belief_measures_u_all.py",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/results/plot_bool_vs_three.py",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/results/plot_belief_measures_u_all_subplots.py",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/results/group_comparisons.py",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/results/group_comparisons_traj.py",
+		"/home/michael/Dropbox/Workspace/phd/reviews/year 2/uncertainty/plot_belief_measures_u_all_subplots.py",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/results/plot_belief_measures_u.py",
+		"/home/michael/Dropbox/Workspace/phd/reviews/year 2/uncertainty/plot_bool_vs_three_u.py",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/results/plot_belief_measures_u_temp.py",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/playground/plot_bool_vs_three_focus.py",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/playground/plot_bool_vs_three_raw.py",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/playground/plot_convergence.py",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/playground/plot_bool_vs_three_initial.py",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/playground/plot_bool_vs_three_beta.py",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/playground/plot_bool_vs_three_u_3d.py",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/playground/plot_bool_vs_three_u.py",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/results/plot_truth_values.py",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/results/plot_one_prop_comparison.py",
+		"/home/michael/Dropbox/Workspace/phd/reviews/year 2/uncertainty/plot_bool_vs_three_traj_u.py",
+		"/Users/michael/Dropbox/Workspace/phd/conferences/SSMCS_2015/payoff/plot_bool_vs_three.py",
+		"/Users/michael/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/results/plot_entropy_vs_vagueness_traj_u.py",
+		"/home/michael/Dropbox/Workspace/phd/projects/msc/results/plot_bool_vs_three.py",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/results/epsilon_sensitivity.py",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/results/payoff_model_comparison_u.py",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/playground/store/world (valuations).d",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/playground/ai/agent.d",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/playground/consensus/operators.d",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/playground/genetics/genetics.d",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/playground/genetics/symmetric.d",
+		"/home/michael/Dropbox/Workspace/phd/projects/djenetics/results/plot_bool_vs_three_traj.py",
+		"/home/michael/Dropbox/Preferences.sublime-settings"
+	],
+	"find":
+	{
+		"height": 70.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"BOOLEAN",
+			"}\n",
+			"siteChoice",
+			"opinionIndex",
+			"*",
+			"opinion1",
+			"newOpinion",
+			"opinion",
+			"dancingBeeIndex",
+			"messageCount",
+			"messageIndex",
+			"messages",
+			"last_update",
+			"32",
+			"consensus",
+			"newOpinion",
+			"sizeOf",
+			"size_t",
+			"message_send",
+			"TESTS",
+			"GRAPHS_DIR",
+			"outfile",
+			"GRAPHS_DIR",
+			"opinionIndex",
+			"messages_received",
+			"line_elements[1]",
+			"siteToVisit",
+			"set_color",
+			"loopCounter",
+			"setDanceState",
+			"setNestSite",
+			"msg.data",
+			"msg.data[1]",
+			"opinion",
+			"Opinion",
+			"opinion",
+			"Opinion",
+			"opinion",
+			"Opinion",
+			"opinion",
+			"Opinion",
+			"opinion",
+			"Opinion",
+			"opinion",
+			"Opinion",
+			"opinion",
+			"Opinion",
+			"opinion",
+			"Opinion",
+			"opinion",
+			"danceState.state",
+			"msg.data[1]",
+			"iterations",
+			"Iterations",
+			"iterations",
+			"radii_runs",
+			"opinion_results",
+			"radius",
+			"radii_run",
+			"radius",
+			"-1",
+			"[radius]",
+			"-1",
+			" = list()",
+			"site_stats",
+			"site",
+			"nest_site_indices",
+			"opinion_indices",
+			"populationSites",
+			"setNestSite",
+			"populationOpinions",
+			"msg.data",
+			"populationSites",
+			"messages_received",
+			"messages",
+			"rx_msg",
+			"populationOpinions",
+			"msg.crc",
+			"messages_received",
+			"legalOpinions",
+			"messages_received",
+			"uint8_t",
+			"messages_received",
+			"message_t",
+			"msg",
+			"message_t",
+			"m ",
+			"m",
+			"dist",
+			"estimate_distance",
+			"messages_received",
+			"populationOpinions",
+			"225",
+			"175",
+			"125",
+			"0",
+			"0.225000",
+			"0.175000",
+			"0.125000",
+			"0.075000",
+			"0.025000",
+			"0.225000",
+			"0.175000",
+			"0.125000",
+			"0.075000",
+			"0.025000",
+			"0.225000",
+			"0.175000",
+			"0.125000",
+			"0.075000",
+			"0.025000",
+			"075000",
+			"0.025000",
+			"0.225000",
+			"0.175000",
+			"0.125000",
+			"0.075000",
+			"0.025000",
+			"messages_received",
+			"msg",
+			"msgsum",
+			"msg",
+			"kilo_message_rx",
+			"message_t",
+			"messages",
+			"message_t",
+			"msg.data",
+			"0.250000"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"0"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 1,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "Makefile",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3132,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								856,
+								856
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Makefile/Makefile.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "blank.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 11649,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								8855,
+								8855
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 5763.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 26.0
+	},
+	"input":
+	{
+		"height": 23.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 98.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "kilobots_c.sublime-project",
+	"replace":
+	{
+		"height": 48.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 354.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 652.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": false,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 221.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
