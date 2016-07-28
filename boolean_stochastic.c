@@ -66,7 +66,7 @@ void setNestSite(uint8_t site, uint8_t quality)
 
 uint8_t getSiteToVisit(double *beliefs)
 {
-    uint8_t siteToVisit = -1;
+    int siteToVisit = -1;
 
     double randomSite = (double) rand_hard() / 255;
 
@@ -84,7 +84,7 @@ uint8_t getSiteToVisit(double *beliefs)
         siteToVisit = LANG_SIZE - 1;
     }
 
-    return siteToVisit;
+    return (uint8_t) siteToVisit;
 }
 
 double franksTNorm(double belief1, double belief2, double p)
