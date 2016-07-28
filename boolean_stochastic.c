@@ -3,7 +3,7 @@
 #include <math.h>
 
 // Default values for core definitions
-#define LANG_SIZE 3
+#define LANG_SIZE 2
 #define POPUL_SIZE 200
 #define MIN_DISTANCE = 100;
 
@@ -14,7 +14,7 @@ int updateTicks = 4;
 int initialDelay = 0;
 int lastUpdate = -1;
 int messageCount = 0;
-int nestQualities[LANG_SIZE] = {7, 9, 10};
+int nestQualities[LANG_SIZE] = {7, 9};
 
 double belief[LANG_SIZE - 1];
 
@@ -26,7 +26,7 @@ double belief[LANG_SIZE - 1];
 double baseParam = 1.0;
 
 
-uint8_t messages[POPUL_SIZE][2];
+uint8_t messages[POPUL_SIZE][LANG_SIZE - 1];
 message_t msg;
 
 /*
@@ -68,7 +68,7 @@ uint8_t getSiteToVisit(double *beliefs)
 {
     int siteToVisit = -1;
 
-    double randomSite = (double) rand_hard() / 255;
+    double randomSite = (double) rand_hard() / 255.0;
 
     for (int i = 0; i < LANG_SIZE - 1; i++)
     {
@@ -182,8 +182,15 @@ void rx_message(message_t *m, distance_measurement_t *d)
     //std::cout << distance << std::endl;
     if (1)// distance < min_distance)
     {
-        messages[messageCount][0] = m->data[0];
-        messages[messageCount][1] = m->data[1];
+        // Dance state
+        messages[messageCount][0] = m->data[2];
+        // Dance site
+        messages[messageCount][1] = m->data[3];
+
+        for (int b = 0; b < LANG_SIZE - 1; b++)
+        {
+            messages[messageCount][2 + b] = m->data[4 + b];
+        }
         messageCount++;
     }
 }
@@ -220,7 +227,7 @@ void setup()
     {
         for (int b = 0; b < LANG_SIZE - 1; b++)
         {
-            beliefs[b] = rand_hard() / 255;
+            beliefs[b] = rand_hard() / 255.0;
         }
 
         uint8_t exitScope = 1;
@@ -243,7 +250,7 @@ void setup()
     setNestSite(siteToVisit, nestQualities[siteToVisit]);
     setDanceState(1, nestQualities[siteToVisit]);
 
-    double probNotDancing = rand_hard() / 255;
+    double probNotDancing = rand_hard() / 255.0;
     if (probNotDancing <= 0.5 && nestQualities[siteToVisit] > 0)
     {
         setDanceState(1, nestQualities[siteToVisit]);
@@ -325,8 +332,12 @@ void loop()
                         // If bee's dance state is true
                         if (messages[i][0] == 1)
                         {
-                            // Set the dancing bee to its opinion index
-                            dancingBees[dbIndex] = messages[i][1];
+                            // Set the dancing bee to its beliefs
+                            for (int b = 0; b < LANG_SIZE - 1; b++)
+                            {
+                            	dancingBees[dbIndex + b] = messages[i][2 + b];
+                            }
+
                             dbIndex += LANG_SIZE - 1;
                         }
                     }
@@ -349,7 +360,7 @@ void loop()
                 }
             }
 
-            double probNotDancing = rand_hard() / 255;
+            double probNotDancing = rand_hard() / 255.0;
             if (probNotDancing <= 0.5 && nestQualities[nest.site] > 0)
             {
                 setDanceState(1, nestQualities[nest.site]);
