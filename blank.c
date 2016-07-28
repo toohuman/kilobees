@@ -147,8 +147,8 @@ double get_noise()
 {
     if (generate == 0)
     {
-        u1 = (double) rand_soft() / 256;
-        u2 = (double) rand_soft() / 256;
+        u1 = (double) (1 + rand_hard())/ 256;
+        u2 = (double) (1 + rand_hard())/ 256;
 
         z1 = sqrt(-2 * log(u1)) * cos(2 * M_PI * u2);
         z2 = sqrt(-2 * log(u1)) * sin(2 * M_PI * u2);
