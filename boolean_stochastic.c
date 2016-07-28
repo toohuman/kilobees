@@ -87,23 +87,6 @@ uint8_t getSiteToVisit(double *beliefs)
     return siteToVisit;
 }
 
-// static double frankTNorm(T, L)(T belief1, T belief2, L p)
-// {
-//  T function(T value1, T value2, L p) func;
-
-//  if (p == 0) func = (x, y, p) => (x <= y) ? x : y;
-//  else if (p == 1) func = (x, y, p) => x * y;
-//  else
-//  {
-//      func = (x, y, p)
-//      {
-//          return log(1 + ( ((pow(exp(p), x) - 1) * (pow(exp(p), y) - 1) ) / (exp(p) - 1)) ) / p;
-//      };
-//  }
-
-//  return func(belief1, belief2, p);
-// }
-
 double franksTNorm(double belief1, double belief2, double p)
 {
     if (p == 0)
@@ -119,23 +102,6 @@ double franksTNorm(double belief1, double belief2, double p)
         return log(1 + (pow(exp(p), belief1) - 1) * (pow(exp(p), belief2) - 1) / (exp(p) - 1) ) / p;
     }
 }
-
-// auto beliefs1 = agent1.getBeliefs;
-// auto beliefs2 = agent2.getBeliefs;
-// auto newBeliefs = beliefs1.dup;
-// foreach (int b, ref belief; newBeliefs)
-// {
-//  auto numerator = Operators.frankTNorm(beliefs1[b][0], beliefs2[b][0], baseParam);
-//  auto denominator = 1.0 - beliefs1[b][0] - beliefs2[b][0] + (2 * Operators.frankTNorm(beliefs1[b][0], beliefs2[b][0], baseParam));
-
-//  // Undefined behaviour of D-S rule of comb. for inconsistent beliefs
-//  if (denominator == 0.0)
-//      belief[0] = belief[1] = 0.5;
-//  else if (numerator == 0.0)
-//      belief[0] = belief[1] = 0.0;
-//  else
-//      belief[0] = belief[1] = (numerator / denominator);
-// }
 
 void consensus(double *beliefs1, double *beliefs2, double *newBeliefs)
 {
@@ -188,6 +154,22 @@ double get_noise()
         generate--;
         return z1;
     }
+}
+
+void set_bot_colour(uint8_t site)
+{
+	switch (site)
+	{
+	    case 0:
+	        set_color(RGB(3, 0, 0));
+	        break;
+	    case 1:
+	        set_color(RGB(0, 0, 3));
+	        break;
+	    case 2:
+	        set_color(RGB(0, 3, 0));
+	        break;
+	}
 }
 
 message_t *tx_message()
@@ -281,6 +263,16 @@ void setup()
 
     msg.type = NORMAL;
     msg.crc = message_crc(&msg);
+
+    if (danceState.state == 1)
+    {
+        set_bot_colour(nest.site);
+    }
+    else
+    {
+        // Set colour to black; not dancing
+        set_color(RGB(0, 0, 0));
+    }
 }
 
 void loop()
@@ -369,18 +361,7 @@ void loop()
 
             if (danceState.state == 1)
             {
-                switch ((uint8_t) nest.site)
-                {
-                    case 0:
-                        set_color(RGB(3, 0, 0));
-                        break;
-                    case 1:
-                        set_color(RGB(0, 0, 3));
-                        break;
-                    case 2:
-                        set_color(RGB(0, 3, 0));
-                        break;
-                }
+                set_bot_colour(nest.site);
             }
             else
             {
