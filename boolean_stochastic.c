@@ -3,9 +3,12 @@
 #include <math.h>
 
 // Default values for core definitions
-#define LANG_SIZE 2
-#define POPUL_SIZE 200
-#define MIN_DISTANCE = 100;
+#define SITE_NUM 2
+#define MAX_MSG_SIZE 50
+#define MIN_DISTANCE 100
+
+#define BELIEF_BYTES 3
+#define BELIEF_PRECISION 7
 
 #define BOOLEAN 1.0;
 
@@ -14,9 +17,10 @@ int updateTicks = 4;
 int initialDelay = 0;
 int lastUpdate = -1;
 int messageCount = 0;
-int nestQualities[LANG_SIZE] = {7, 9};
+int nestQualities[SITE_NUM] = {7, 9};
 
-double belief[LANG_SIZE - 1];
+double belief[SITE_NUM - 1];
+int beliefStart = 4;
 
 // Frank's T-norm:
 // 0.0 = min
@@ -26,7 +30,7 @@ double belief[LANG_SIZE - 1];
 double baseParam = 1.0;
 
 
-uint8_t messages[POPUL_SIZE][LANG_SIZE - 1];
+uint8_t messages[MAX_MSG_SIZE][2 + (BELIEF_BYTES * (SITE_NUM - 1))];
 message_t msg;
 
 /*
@@ -45,7 +49,7 @@ struct State
     uint8_t duration;
 };
 
-double beliefs[LANG_SIZE];
+double beliefs[SITE_NUM];
 
 // Kilobee state/belief variables
 
@@ -64,15 +68,37 @@ void setNestSite(uint8_t site, uint8_t quality)
     nest.siteQuality = quality;
 }
 
+double bytesToDouble(uint8_t *msgData)
+{
+    uint32_t reformedBytes = 0;
+    int b = 0;
+    for (int i = 8 * (BELIEF_BYTES - 1); i >= 0; i -= 8)
+    {
+        reformedBytes += (*(msgData + b++) << i);
+    }
+
+    return (double) reformedBytes / pow(10, BELIEF_PRECISION);
+}
+
+void doubleToBytes(double belief, uint8_t *convertedBytes)
+{
+    uint32_t convertedBelief = (uint32_t) ((belief * pow(10, BELIEF_PRECISION)) + 0.5);
+    int b = 0;
+    for (int i = 8 * (BELIEF_BYTES - 1); i >= 0; i -= 8)
+    {
+        *(convertedBytes + b++) = (uint8_t) (convertedBelief >> i) & 0xFF;
+    }
+}
+
 uint8_t getSiteToVisit(double *beliefs)
 {
     int siteToVisit = -1;
 
     double randomSite = (double) rand_hard() / 255.0;
 
-    for (int i = 0; i < LANG_SIZE - 1; i++)
+    for (int i = 0; i < SITE_NUM - 1; i++)
     {
-        if (randomSite <= beliefs[i])
+        if (randomSite < beliefs[i])
         {
             siteToVisit = i;
             break;
@@ -81,7 +107,7 @@ uint8_t getSiteToVisit(double *beliefs)
 
     if (siteToVisit == -1)
     {
-        siteToVisit = LANG_SIZE - 1;
+        siteToVisit = SITE_NUM - 1;
     }
 
     return (uint8_t) siteToVisit;
@@ -105,10 +131,10 @@ double franksTNorm(double belief1, double belief2, double p)
 
 void consensus(double *beliefs1, double *beliefs2, double *newBeliefs)
 {
-    for (int b = 0; b < LANG_SIZE - 1; b++)
+    for (int b = 0; b < SITE_NUM - 1; b++)
     {
-        double numerator = franksTNorm(beliefs1[0], beliefs2[0], baseParam);
-        double denominator = 1.0 - beliefs1[0] - beliefs2[0] + (2 * numerator);
+        double numerator = franksTNorm(beliefs1[b], beliefs2[b], baseParam);
+        double denominator = 1.0 - beliefs1[b] - beliefs2[b] + (2.0 * numerator);
 
         double newValue = 0.0;
 
@@ -176,20 +202,20 @@ message_t *tx_message()
 {
     return &msg;
 }
+
 void rx_message(message_t *m, distance_measurement_t *d)
 {
     //int distance = estimate_distance(d);
-    //std::cout << distance << std::endl;
     if (1)// distance < min_distance)
     {
         // Dance state
         messages[messageCount][0] = m->data[2];
         // Dance site
         messages[messageCount][1] = m->data[3];
-
-        for (int b = 0; b < LANG_SIZE - 1; b++)
+        // Beliefs
+        for (int b = 0; b < 3 * (SITE_NUM - 1); b++)
         {
-            messages[messageCount][2 + b] = m->data[4 + b];
+            messages[messageCount][2 + b] = m->data[beliefStart + b];
         }
         messageCount++;
     }
@@ -225,7 +251,7 @@ void setup()
 
     while (1)
     {
-        for (int b = 0; b < LANG_SIZE - 1; b++)
+        for (int b = 0; b < SITE_NUM - 1; b++)
         {
             beliefs[b] = rand_hard() / 255.0;
         }
@@ -233,7 +259,7 @@ void setup()
         uint8_t exitScope = 1;
         double prevBelief = beliefs[0];
 
-        for (int b = 1; b < LANG_SIZE - 1; b++)
+        for (int b = 1; b < SITE_NUM - 1; b++)
         {
            if (prevBelief <= beliefs[b])
            {
@@ -265,8 +291,20 @@ void setup()
     msg.data[0] = rand_hard();
     msg.data[1] = rand_hard();
     // Dance state
-    msg.data[3] = danceState.state;
-    msg.data[4] = nest.site;
+    msg.data[2] = danceState.state;
+    msg.data[3] = nest.site;
+    // Beliefs
+    uint8_t convertedBytes[BELIEF_BYTES * (SITE_NUM - 1)];
+    int msgIndex = 4;
+    for (int b = 0; b < SITE_NUM - 1; b++)
+    {
+        int byteIndex = msgIndex + (b * BELIEF_BYTES);
+        doubleToBytes(beliefs[b], convertedBytes + (b * BELIEF_BYTES));
+        for (int i = b * BELIEF_BYTES; i < (b * BELIEF_BYTES) + BELIEF_BYTES; i++)
+        {
+        	msg.data[byteIndex + i] = convertedBytes[i];
+        }
+    }
 
     msg.type = NORMAL;
     msg.crc = message_crc(&msg);
@@ -308,6 +346,17 @@ void loop()
                 break;
         }*/
 
+	    // Dance state
+	    msg.data[2] = danceState.state;
+	    msg.data[3] = nest.site;
+	    // Beliefs
+	    for (int b = 0; b < SITE_NUM - 1; b++)
+	    {
+	    	msg.data[4 + b] = beliefs[b];
+	    }
+
+	    msg.type = NORMAL;
+	    msg.crc = message_crc(&msg);
 
         if (danceState.state == 0)
         {
@@ -325,7 +374,7 @@ void loop()
 
                 if (dancingBeeCount > 0)
                 {
-                    double *dancingBees = (double *) malloc(sizeof(double) * (dancingBeeCount * LANG_SIZE - 1));
+                    double *dancingBees = (double *) malloc(sizeof(double) * (dancingBeeCount * SITE_NUM - 1));
                     int dbIndex = 0;
                     for (int i = 0; i < messageCount; i++)
                     {
@@ -333,21 +382,21 @@ void loop()
                         if (messages[i][0] == 1)
                         {
                             // Set the dancing bee to its beliefs
-                            for (int b = 0; b < LANG_SIZE - 1; b++)
+                            for (int b = 0; b < SITE_NUM - 1; b++)
                             {
-                            	dancingBees[dbIndex + b] = messages[i][2 + b];
+                            	dancingBees[dbIndex + b] = bytesToDouble(&messages[i][2 + b]);
                             }
 
-                            dbIndex += LANG_SIZE - 1;
+                            dbIndex += SITE_NUM - 1;
                         }
                     }
 
-                    double *otherBeliefs = &dancingBees[(rand_hard() % dancingBeeCount) * (LANG_SIZE - 1)];
-                    double newBeliefs[LANG_SIZE - 1];
+                    double *otherBeliefs = &dancingBees[(rand_hard() % dancingBeeCount) * (SITE_NUM - 1)];
+                    double newBeliefs[SITE_NUM - 1];
 
                     consensus(beliefs, otherBeliefs, newBeliefs);
 
-                    for (int i = 0; i < LANG_SIZE; i++)
+                    for (int i = 0; i < SITE_NUM - 1; i++)
                     {
                         beliefs[i] = newBeliefs[i];
                     }
