@@ -19,7 +19,7 @@ int lastUpdate = -1;
 int messageCount = 0;
 int nestQualities[SITE_NUM] = {7, 9};
 
-double belief[SITE_NUM - 1];
+double beliefs[SITE_NUM - 1];
 int beliefStart = 4;
 
 // Frank's T-norm:
@@ -48,8 +48,6 @@ struct State
     uint8_t state;
     uint8_t duration;
 };
-
-double beliefs[SITE_NUM];
 
 // Kilobee state/belief variables
 
