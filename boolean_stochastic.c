@@ -4,7 +4,7 @@
 
 // Default values for core definitions
 #define SITE_NUM 2
-#define MAX_MSG_SIZE 50
+#define MAX_MSG_SIZE 100
 #define MIN_DISTANCE 100
 
 #define BELIEF_BYTES 3
@@ -125,7 +125,7 @@ double franksTNorm(double belief1, double belief2, double p)
     }
     else
     {
-        return log(1 + (pow(exp(p), belief1) - 1) * (pow(exp(p), belief2) - 1) / (exp(p) - 1) ) / p;
+        return log(1.0 + (pow(exp(p), belief1) - 1.0) * (pow(exp(p), belief2) - 1.0) / (exp(p) - 1.0) ) / p;
     }
 }
 
@@ -169,8 +169,8 @@ double get_noise()
         u1 = (double) rand_hard() / 256;
         u2 = (double) rand_hard() / 256;
 
-        z1 = sqrt(-2 * log(u1)) * cos(2 * M_PI * u2);
-        z2 = sqrt(-2 * log(u1)) * sin(2 * M_PI * u2);
+        z1 = sqrt(-2.0 * log(u1)) * cos(2.0 * M_PI * u2);
+        z2 = sqrt(-2.0 * log(u1)) * sin(2.0 * M_PI * u2);
 
         generate++;
         return z2;
@@ -184,18 +184,18 @@ double get_noise()
 
 void set_bot_colour(uint8_t site)
 {
-	switch (site)
-	{
-	    case 0:
-	        set_color(RGB(3, 0, 0));
-	        break;
-	    case 1:
-	        set_color(RGB(0, 0, 3));
-	        break;
-	    case 2:
-	        set_color(RGB(0, 3, 0));
-	        break;
-	}
+    switch (site)
+    {
+        case 0:
+            set_color(RGB(3, 0, 0));
+            break;
+        case 1:
+            set_color(RGB(0, 0, 3));
+            break;
+        case 2:
+            set_color(RGB(0, 3, 0));
+            break;
+    }
 }
 
 message_t *tx_message()
@@ -206,6 +206,7 @@ message_t *tx_message()
 void rx_message(message_t *m, distance_measurement_t *d)
 {
     //int distance = estimate_distance(d);
+    //std::cout << distance << std::endl;
     if (1)// distance < min_distance)
     {
         // Dance state
@@ -295,10 +296,9 @@ void setup()
     msg.data[3] = nest.site;
     // Beliefs
     uint8_t convertedBytes[BELIEF_BYTES * (SITE_NUM - 1)];
-    int msgIndex = 4;
     for (int b = 0; b < SITE_NUM - 1; b++)
     {
-        int byteIndex = msgIndex + (b * BELIEF_BYTES);
+        int byteIndex = beliefStart + (b * BELIEF_BYTES);
         doubleToBytes(beliefs[b], convertedBytes + (b * BELIEF_BYTES));
         for (int i = b * BELIEF_BYTES; i < (b * BELIEF_BYTES) + BELIEF_BYTES; i++)
         {
@@ -350,9 +350,15 @@ void loop()
 	    msg.data[2] = danceState.state;
 	    msg.data[3] = nest.site;
 	    // Beliefs
+	    uint8_t convertedBytes[BELIEF_BYTES * (SITE_NUM - 1)];
 	    for (int b = 0; b < SITE_NUM - 1; b++)
 	    {
-	    	msg.data[4 + b] = beliefs[b];
+	        int byteIndex = beliefStart + (b * BELIEF_BYTES);
+	        doubleToBytes(beliefs[b], convertedBytes + (b * BELIEF_BYTES));
+	        for (int i = b * BELIEF_BYTES; i < (b * BELIEF_BYTES) + BELIEF_BYTES; i++)
+	        {
+	        	msg.data[byteIndex + i] = convertedBytes[i];
+	        }
 	    }
 
 	    msg.type = NORMAL;
