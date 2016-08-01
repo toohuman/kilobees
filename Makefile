@@ -56,6 +56,9 @@ build/blank.elf: blank.c $(KILOLIB) | build
 build/boolean-stochastic.elf: boolean_stochastic.c $(KILOLIB) | build
 	$(CC) $(CFLAGS) -o $@ $< $(KILOLIB)
 
+build/boolean-adopt-dancer.elf: boolean_adopt_dancer.c $(KILOLIB) | build
+	$(CC) $(CFLAGS) -o $@ $< $(KILOLIB)
+
 build/ohc.elf: ohc.c message_crc.c message_send.S | build
 	$(CC) $(CFLAGS) $(OHC_FLAGS) -o $@ ohc.c message_crc.c message_send.S
 
@@ -91,6 +94,9 @@ program-blank: build/blank.hex build/bootldr.hex
 
 program-boolean-stochastic: build/boolean_stochastic.hex build/bootldr.hex
 	$(AVRUP) -p m328p $(PFLAGS) -U "flash:w:build/boolean_stochastic.hex:i" -U "flash:w:build/bootldr.hex"
+
+program-boolean-adopt-dancer: build/boolean_adopt_dancer.hex build/bootldr.hex
+	$(AVRUP) -p m328p $(PFLAGS) -U "flash:w:build/boolean_adopt_dancer.hex:i" -U "flash:w:build/bootldr.hex"
 
 docs:
 	cat message.h kilolib.h message_crc.h | grep -v "^\#" > docs/kilolib.h
