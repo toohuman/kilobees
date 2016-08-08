@@ -10,17 +10,15 @@
 #define BELIEF_BYTES 3
 #define BELIEF_PRECISION 7
 
-#define BOOLEAN 1.0;
-
 // Individual variables for bots
-int updateTicks = 4;
+int updateTicks = 8; // 32 updates per second
 int initialDelay = 0;
 int lastUpdate = -1;
 int messageCount = 0;
 int nestQualities[SITE_NUM] = {7, 9};
 
 double beliefs[SITE_NUM - 1];
-int beliefStart = 4;
+int beliefStart = 2;
 
 // Frank's T-norm:
 // 0.0 = min
@@ -208,9 +206,9 @@ void rx_message(message_t *m, distance_measurement_t *d)
     if (1)// distance < min_distance)
     {
         // Dance state
-        messages[messageCount][0] = m->data[2];
+        messages[messageCount][0] = m->data[0];
         // Dance site
-        messages[messageCount][1] = m->data[3];
+        messages[messageCount][1] = m->data[1];
         // Beliefs
         for (int b = 0; b < 3 * (SITE_NUM - 1); b++)
         {
@@ -235,12 +233,12 @@ void setup()
 
     // Construct a valid message
     // Format will be:
-    // [0] - first 8-bits of ID.
-    // [1] - final 8-bits of ID.
-    // [2] - dance state; 1 (true) if bee is dancing, 0 (false) if not.
-    // [3] - dance site; the site that is currently being danced for.
-    // [4] - belief[0]; site value "x" (for 0:x, 1: 1 - x).
-    // [5] - belief[1]; optional for 3-sites (language size: 3).
+    // [0] - dance state; 1 (true) if bee is dancing, 0 (false) if not.
+    // [1] - dance site; the site that is currently being danced for.
+    // [2] - belief[0]; site value "x" (for 0:x, 1: 1 - x).
+    // [3] - belief[1]; optional for 3-sites (language size: 3).
+    // [4]
+    // [5]
     // [6]
     // [7]
     // [8]
@@ -260,7 +258,7 @@ void setup()
 
         for (int b = 1; b < SITE_NUM - 1; b++)
         {
-           if (prevBelief <= beliefs[b])
+           if (prevBelief > beliefs[b])
            {
                 exitScope = 0;
                 break;
@@ -287,11 +285,11 @@ void setup()
 
     // Generate random integers to fill both ID bytes, leading to a 16-bit
     // number with 65,536 possible values: 255 (8-bit) x 255 (8-bit).
-    msg.data[0] = rand_hard();
-    msg.data[1] = rand_hard();
+    //msg.data[0] = rand_hard();
+    //msg.data[1] = rand_hard();
     // Dance state
-    msg.data[2] = danceState.state;
-    msg.data[3] = nest.site;
+    msg.data[0] = danceState.state;
+    msg.data[1] = nest.site;
     // Beliefs
     uint8_t convertedBytes[BELIEF_BYTES * (SITE_NUM - 1)];
     for (int b = 0; b < SITE_NUM - 1; b++)
@@ -345,8 +343,8 @@ void loop()
         }*/
 
 	    // Dance state
-	    msg.data[2] = danceState.state;
-	    msg.data[3] = nest.site;
+	    msg.data[0] = danceState.state;
+	    msg.data[1] = nest.site;
 	    // Beliefs
 	    uint8_t convertedBytes[BELIEF_BYTES * (SITE_NUM - 1)];
 	    for (int b = 0; b < SITE_NUM - 1; b++)
