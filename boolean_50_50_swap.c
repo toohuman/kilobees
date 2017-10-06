@@ -250,7 +250,7 @@ void setup()
     {
         for (int b = 0; b < SITE_NUM - 1; b++)
         {
-            beliefs[b] = rand_hard() / 255.0;
+            beliefs[b] = rand_hard() % 2;
         }
 
         uint8_t exitScope = 1;
@@ -393,14 +393,17 @@ void loop()
                         }
                     }
 
-                    double *otherBeliefs = &dancingBees[(rand_hard() % dancingBeeCount) * (SITE_NUM - 1)];
-                    double newBeliefs[SITE_NUM - 1];
+                    double *otherBeliefs = &dancingBees[(rand_soft() % dancingBeeCount) * (SITE_NUM - 1)];
+                    //double newBeliefs[SITE_NUM - 1];
 
-                    consensus(beliefs, otherBeliefs, newBeliefs);
+                    //consensus(beliefs, otherBeliefs, newBeliefs);
 
-                    for (int i = 0; i < SITE_NUM - 1; i++)
+                    if (rand_soft() % 2 == 1)
                     {
-                        beliefs[i] = newBeliefs[i];
+                        for (int i = 0; i < SITE_NUM - 1; i++)
+                        {
+                            beliefs[i] = otherBeliefs[i];
+                        }
                     }
 
                     uint8_t siteToVisit = getSiteToVisit(beliefs);

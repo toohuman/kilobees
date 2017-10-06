@@ -1,10 +1,14 @@
-all: bootldr blank boolean-stochastic ohc ohc-big ohc-arduino-8mhz ohc-arduino-16mhz
+all: bootldr blank boolean-uncertainty boolean-adopt-dancer boolean-adopt-mal three-valued three-valued-mal ohc ohc-big ohc-arduino-8mhz ohc-arduino-16mhz
 
-.PHONY: docs bootldr blank boolean-stochastic ohc ohc-big ohc-arduino-8mhz ohc-arduino-16mhz
+.PHONY: docs bootldr blank ohc ohc-big ohc-arduino-8mhz ohc-arduino-16mhz
 KILOLIB = build/kilolib.a
 bootldr: build/bootldr.elf build/bootldr.hex build/bootldr.lss
 blank: build/blank.elf build/blank.hex build/blank.lss
-boolean-stochastic: build/boolean-stochastic.elf build/boolean-stochastic.hex build/boolean-stochastic.lss
+boolean-uncertainty: build/boolean-uncertainty.elf build/boolean-uncertainty.hex build/boolean-uncertainty.lss
+boolean-adopt-dancer: build/boolean-adopt-dancer.elf build/boolean-adopt-dancer.hex build/boolean-adopt-dancer.lss
+boolean-adopt-mal: build/boolean-adopt-mal.elf build/boolean-adopt-mal.hex build/boolean-adopt-mal.lss
+three-valued: build/three-valued.elf build/three-valued.hex build/three-valued.lss
+three-valued-mal: build/three-valued-mal.elf build/three-valued-mal.hex build/three-valued-mal.lss
 ohc: build/ohc.elf build/ohc.hex build/ohc.lss
 ohc-big: build/ohc-big.elf build/ohc-big.hex build/ohc-big.lss
 ohc-arduino-8mhz: build/ohc-arduino-8mhz.elf build/ohc-arduino-8mhz.hex build/ohc-arduino-8mhz.lss
@@ -53,13 +57,19 @@ $(KILOLIB): kilolib.o message_crc.o message_send.o | build
 build/blank.elf: blank.c $(KILOLIB) | build
 	$(CC) $(CFLAGS) -o $@ $< $(KILOLIB)
 
-build/boolean-stochastic.elf: boolean_stochastic.c $(KILOLIB) | build
+build/boolean-uncertainty.elf: boolean_uncertainty.c $(KILOLIB) | build
 	$(CC) $(CFLAGS) -o $@ $< $(KILOLIB)
 
 build/boolean-adopt-dancer.elf: boolean_adopt_dancer.c $(KILOLIB) | build
 	$(CC) $(CFLAGS) -o $@ $< $(KILOLIB)
 
-build/boolean-50-50-swap.elf: boolean_50_50_swap.c $(KILOLIB) | build
+build/boolean-adopt-mal.elf: boolean_adopt_mal.c $(KILOLIB) | build
+	$(CC) $(CFLAGS) -o $@ $< $(KILOLIB)
+
+build/three-valued.elf: three_valued.c $(KILOLIB) | build
+	$(CC) $(CFLAGS) -o $@ $< $(KILOLIB)
+
+build/three-valued-mal.elf: three_valued_mal.c $(KILOLIB) | build
 	$(CC) $(CFLAGS) -o $@ $< $(KILOLIB)
 
 build/ohc.elf: ohc.c message_crc.c message_send.S | build
@@ -95,14 +105,20 @@ program-boot: build/bootldr.hex
 program-blank: build/blank.hex build/bootldr.hex
 	$(AVRUP) -p m328p $(PFLAGS) -U "flash:w:build/blank.hex:i" -U "flash:w:build/bootldr.hex"
 
-program-boolean-stochastic: build/boolean_stochastic.hex build/bootldr.hex
-	$(AVRUP) -p m328p $(PFLAGS) -U "flash:w:build/boolean_stochastic.hex:i" -U "flash:w:build/bootldr.hex"
+program-boolean-uncertainty: build/boolean_uncertainty.hex build/bootldr.hex
+	$(AVRUP) -p m328p $(PFLAGS) -U "flash:w:build/boolean_uncertainty.hex:i" -U "flash:w:build/bootldr.hex"
 
 program-boolean-adopt-dancer: build/boolean_adopt_dancer.hex build/bootldr.hex
 	$(AVRUP) -p m328p $(PFLAGS) -U "flash:w:build/boolean_adopt_dancer.hex:i" -U "flash:w:build/bootldr.hex"
 
-program-boolean-50-50-swap: build/boolean_50_50_swap.hex build/bootldr.hex
-	$(AVRUP) -p m328p $(PFLAGS) -U "flash:w:build/boolean_50_50_swap.hex:i" -U "flash:w:build/bootldr.hex"
+program-boolean-adopt-mal: build/boolean_adopt_mal.hex build/bootldr.hex
+	$(AVRUP) -p m328p $(PFLAGS) -U "flash:w:build/boolean_adopt_mal.hex:i" -U "flash:w:build/bootldr.hex"
+
+program-three-valued: build/three_valued.hex build/bootldr.hex
+	$(AVRUP) -p m328p $(PFLAGS) -U "flash:w:build/three_valued.hex:i" -U "flash:w:build/bootldr.hex"
+
+program-three-valued-mal: build/three_valued_mal.hex build/bootldr.hex
+	$(AVRUP) -p m328p $(PFLAGS) -U "flash:w:build/three_valued_mal.hex:i" -U "flash:w:build/bootldr.hex"
 
 docs:
 	cat message.h kilolib.h message_crc.h | grep -v "^\#" > docs/kilolib.h

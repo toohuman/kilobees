@@ -7,17 +7,19 @@
 #define MAX_MSG_SIZE 100
 #define MIN_DISTANCE 100
 
-#define BELIEF_BYTES 3
-#define BELIEF_PRECISION 7
+#define BELIEF_BYTES 1
+#define BELIEF_PRECISION 1
 
 // Individual variables for bots
-int updateTicks = 8; // 32 updates per second
+int updateTicks = 16; // 32 updates per second
 int initialDelay = 0;
 int lastUpdate = -1;
 int messageCount = 0;
 int nestQualities[SITE_NUM] = {7, 9};
+int loopCounter = 0;
+int isMalicious = 0;
 
-double beliefs[SITE_NUM - 1];
+uint8_t beliefs[SITE_NUM];
 int beliefStart = 2;
 
 // Frank's T-norm:
@@ -28,7 +30,7 @@ int beliefStart = 2;
 double baseParam = 1.0;
 
 
-uint8_t messages[MAX_MSG_SIZE][2 + (BELIEF_BYTES * (SITE_NUM - 1))];
+uint8_t messages[MAX_MSG_SIZE][2 + SITE_NUM];
 message_t msg;
 
 /*
@@ -64,46 +66,17 @@ void setNestSite(uint8_t site, uint8_t quality)
     nest.siteQuality = quality;
 }
 
-double bytesToDouble(uint8_t *msgData)
-{
-    uint32_t reformedBytes = 0;
-    int b = 0;
-    for (int i = 8 * (BELIEF_BYTES - 1); i >= 0; i -= 8)
-    {
-        reformedBytes += (*(msgData + b++) << i);
-    }
-
-    return (double) reformedBytes / pow(10, BELIEF_PRECISION);
-}
-
-void doubleToBytes(double belief, uint8_t *convertedBytes)
-{
-    uint32_t convertedBelief = (uint32_t) ((belief * pow(10, BELIEF_PRECISION)) + 0.5);
-    int b = 0;
-    for (int i = 8 * (BELIEF_BYTES - 1); i >= 0; i -= 8)
-    {
-        *(convertedBytes + b++) = (uint8_t) (convertedBelief >> i) & 0xFF;
-    }
-}
-
-uint8_t getSiteToVisit(double *beliefs)
+uint8_t getSiteToVisit(uint8_t *beliefs)
 {
     int siteToVisit = -1;
 
-    double randomSite = (double) rand_hard() / 255.0;
-
-    for (int i = 0; i < SITE_NUM - 1; i++)
+    for (int i = 0; i < SITE_NUM; i++)
     {
-        if (randomSite < beliefs[i])
+        if (beliefs[i] == 1)
         {
             siteToVisit = i;
             break;
         }
-    }
-
-    if (siteToVisit == -1)
-    {
-        siteToVisit = SITE_NUM - 1;
     }
 
     return (uint8_t) siteToVisit;
@@ -125,30 +98,35 @@ double franksTNorm(double belief1, double belief2, double p)
     }
 }
 
-void consensus(double *beliefs1, double *beliefs2, double *newBeliefs)
+void consensus(uint8_t *beliefs1, uint8_t *beliefs2)
 {
-    for (int b = 0; b < SITE_NUM - 1; b++)
+    for (int b = 0; b < SITE_NUM; b++)
     {
-        double numerator = franksTNorm(beliefs1[b], beliefs2[b], baseParam);
-        double denominator = 1.0 - beliefs1[b] - beliefs2[b] + (2.0 * numerator);
-
-        double newValue = 0.0;
-
-        // Undefined behaviour of D-S rule of combination for inconsistent beliefs
-        if (denominator == 0.0)
+        if (beliefs1[b] == 2)
         {
-            newValue = 0.5;
+            if (beliefs2[b] == 0)
+            {
+                beliefs1[b] = 1;
+            }
         }
-        else if (numerator == 0.0)
+        else if (beliefs1[b] == 0)
         {
-            newValue = 0.0;
+            if (beliefs2[b] == 2)
+            {
+                beliefs1[b] = 1;
+            }
         }
-        else
+        else if (beliefs1[b] == 1)
         {
-            newValue = (numerator / denominator);
+            if (beliefs2[b] == 2)
+            {
+                beliefs1[b] = 2;
+            }
+            else if (beliefs2[b] == 0)
+            {
+                beliefs1[b] = 0;
+            }
         }
-
-        newBeliefs[b] = newValue;
     }
 }
 
@@ -162,11 +140,14 @@ double get_noise()
 {
     if (generate == 0)
     {
-        u1 = (double) rand_hard() / 256;
-        u2 = (double) rand_hard() / 256;
+        u1 = (double) (1 + rand_hard()) / 256;
+        u2 = (double) (1 + rand_hard()) / 256;
 
         z1 = sqrt(-2.0 * log(u1)) * cos(2.0 * M_PI * u2);
         z2 = sqrt(-2.0 * log(u1)) * sin(2.0 * M_PI * u2);
+
+        z1 = (0 * z1);
+        z2 = (0 * z2);
 
         generate++;
         return z2;
@@ -202,7 +183,6 @@ message_t *tx_message()
 void rx_message(message_t *m, distance_measurement_t *d)
 {
     //int distance = estimate_distance(d);
-    //std::cout << distance << std::endl;
     if (1)// distance < min_distance)
     {
         // Dance state
@@ -210,7 +190,7 @@ void rx_message(message_t *m, distance_measurement_t *d)
         // Dance site
         messages[messageCount][1] = m->data[1];
         // Beliefs
-        for (int b = 0; b < 3 * (SITE_NUM - 1); b++)
+        for (int b = 0; b < SITE_NUM; b++)
         {
             messages[messageCount][2 + b] = m->data[beliefStart + b];
         }
@@ -233,12 +213,12 @@ void setup()
 
     // Construct a valid message
     // Format will be:
-    // [0] - first 8-bits of ID.
-    // [1] - final 8-bits of ID.
-    // [2] - dance state; 1 (true) if bee is dancing, 0 (false) if not.
-    // [3] - dance site; the site that is currently being danced for.
-    // [4] - belief[0]; site value "x" (for 0:x, 1: 1 - x).
-    // [5] - belief[1]; optional for 3-sites (language size: 3).
+    // [0] - dance state; 1 (true) if bee is dancing, 0 (false) if not.
+    // [1] - dance site; the site that is currently being danced for.
+    // [2] - belief[0]; site value "x" (for 0:x, 1: 1 - x).
+    // [3] - belief[1]; optional for 3-sites (language size: 3).
+    // [4]
+    // [5]
     // [6]
     // [7]
     // [8]
@@ -246,39 +226,33 @@ void setup()
     // msg.type = NORMAL;
     // msg.crc = message_crc(&msg);
 
-    while (1)
+    /*
+     * MALICIOUS AGENT DETERMINATION
+     */
+
+    if ((rand_hard() / 255.0) < 0.1)
     {
-        for (int b = 0; b < SITE_NUM - 1; b++)
-        {
-            beliefs[b] = rand_hard() / 255.0;
-        }
-
-        uint8_t exitScope = 1;
-        double prevBelief = beliefs[0];
-
-        for (int b = 1; b < SITE_NUM - 1; b++)
-        {
-           if (prevBelief <= beliefs[b])
-           {
-                exitScope = 0;
-                break;
-           }
-        }
-
-        if (exitScope == 1)
-            break;
+        isMalicious = 1;
     }
+
+    for (int b = 0; b < SITE_NUM; b++)
+    {
+        beliefs[b] = 0;
+    }
+
+    beliefs[rand_hard() % SITE_NUM] = 1;
 
     uint8_t siteToVisit = getSiteToVisit(beliefs);
     setNestSite(siteToVisit, nestQualities[siteToVisit]);
-    setDanceState(1, nestQualities[siteToVisit]);
+    int danceDuration = nestQualities[siteToVisit] + round(get_noise());
+    if (danceDuration <= 0)
+    {
+        danceDuration = 1;
+    }
+    setDanceState(1, danceDuration);
 
     double probNotDancing = rand_hard() / 255.0;
-    if (probNotDancing <= 0.5 && nestQualities[siteToVisit] > 0)
-    {
-        setDanceState(1, nestQualities[siteToVisit]);
-    }
-    else
+    if (probNotDancing <= 0.5)
     {
         setDanceState(0, 0);
     }
@@ -291,21 +265,19 @@ void setup()
     msg.data[0] = danceState.state;
     msg.data[1] = nest.site;
     // Beliefs
-    uint8_t convertedBytes[BELIEF_BYTES * (SITE_NUM - 1)];
-    for (int b = 0; b < SITE_NUM - 1; b++)
+    for (int b = 0; b < SITE_NUM; b++)
     {
-        int byteIndex = beliefStart + (b * BELIEF_BYTES);
-        doubleToBytes(beliefs[b], convertedBytes + (b * BELIEF_BYTES));
-        for (int i = b * BELIEF_BYTES; i < (b * BELIEF_BYTES) + BELIEF_BYTES; i++)
-        {
-        	msg.data[byteIndex + i] = convertedBytes[i];
-        }
+        msg.data[beliefStart + b] = beliefs[b];
     }
 
     msg.type = NORMAL;
     msg.crc = message_crc(&msg);
 
-    if (danceState.state == 1)
+    if (isMalicious == 1)
+    {
+        set_color(RGB(0, 2, 0));
+    }
+    else if (danceState.state == 1)
     {
         set_bot_colour(nest.site);
     }
@@ -322,47 +294,36 @@ void loop()
     {
         lastUpdate = kilo_ticks;
 
-        // Random movement
-        /*switch(rand_hard() % 4)
+        set_motors(0,0);
+
+        // Dance state
+        msg.data[0] = danceState.state;
+        msg.data[1] = nest.site;
+        // Beliefs
+        for (int b = 0; b < SITE_NUM; b++)
         {
-            case(0):
-                set_motors(0,0);
-                break;
-            case(1):
-                //if (last_output == 0) spinup_motors();
-                set_motors(kilo_turn_left,0); // 70
-                break;
-            case(2):
-                //if (last_output == 0) spinup_motors();
-                set_motors(0,kilo_turn_right); // 70
-                break;
-            case(3):
-                //if (last_output == 0) spinup_motors();
-                set_motors(kilo_straight_left, kilo_straight_right); // 65
-                break;
-        }*/
+            msg.data[beliefStart + b] = beliefs[b];
+        }
 
-	    // Dance state
-	    msg.data[0] = danceState.state;
-	    msg.data[1] = nest.site;
-	    // Beliefs
-	    uint8_t convertedBytes[BELIEF_BYTES * (SITE_NUM - 1)];
-	    for (int b = 0; b < SITE_NUM - 1; b++)
-	    {
-	        int byteIndex = beliefStart + (b * BELIEF_BYTES);
-	        doubleToBytes(beliefs[b], convertedBytes + (b * BELIEF_BYTES));
-	        for (int i = b * BELIEF_BYTES; i < (b * BELIEF_BYTES) + BELIEF_BYTES; i++)
-	        {
-	        	msg.data[byteIndex + i] = convertedBytes[i];
-	        }
-	    }
-
-	    msg.type = NORMAL;
-	    msg.crc = message_crc(&msg);
+        msg.type = NORMAL;
+        msg.crc = message_crc(&msg);
 
         if (danceState.state == 0)
         {
-            if (messageCount > 0)
+            if (isMalicious == 1)
+            {
+                for (int b = 0; b < SITE_NUM; b++)
+                {
+                    beliefs[b] = 0;
+                }
+
+                beliefs[rand_hard() % SITE_NUM] = 1;
+
+                uint8_t siteToVisit = getSiteToVisit(beliefs);
+                setNestSite(siteToVisit, nestQualities[siteToVisit]);
+                setDanceState(1, nestQualities[siteToVisit]);
+            }
+            else if (messageCount > 0)
             {
                 int dancingBeeCount = 0;
                 for (int i = 0; i < messageCount; i++)
@@ -376,7 +337,7 @@ void loop()
 
                 if (dancingBeeCount > 0)
                 {
-                    double *dancingBees = (double *) malloc(sizeof(double) * (dancingBeeCount * SITE_NUM - 1));
+                    uint8_t *dancingBees = (uint8_t *) malloc(sizeof(uint8_t) * (dancingBeeCount * SITE_NUM));
                     int dbIndex = 0;
                     for (int i = 0; i < messageCount; i++)
                     {
@@ -384,45 +345,59 @@ void loop()
                         if (messages[i][0] == 1)
                         {
                             // Set the dancing bee to its beliefs
-                            for (int b = 0; b < SITE_NUM - 1; b++)
+                            for (int b = 0; b < SITE_NUM; b++)
                             {
-                            	dancingBees[dbIndex + b] = bytesToDouble(&messages[i][2 + b]);
+                                dancingBees[dbIndex + b] = messages[i][2 + b];
                             }
 
-                            dbIndex += SITE_NUM - 1;
+                            dbIndex += SITE_NUM;
                         }
                     }
 
-                    double *otherBeliefs = &dancingBees[(rand_hard() % dancingBeeCount) * (SITE_NUM - 1)];
-                    double newBeliefs[SITE_NUM - 1];
+                    uint8_t *otherBeliefs = &dancingBees[(rand_hard() % dancingBeeCount) * (SITE_NUM)];
 
-                    consensus(beliefs, otherBeliefs, newBeliefs);
-
-                    for (int i = 0; i < SITE_NUM - 1; i++)
+                    for (int i = 0; i < SITE_NUM; i++)
                     {
-                        beliefs[i] = newBeliefs[i];
+                        beliefs[i] = otherBeliefs[i];
                     }
 
                     uint8_t siteToVisit = getSiteToVisit(beliefs);
                     setNestSite(siteToVisit, nestQualities[siteToVisit]);
-                    setDanceState(1, nestQualities[siteToVisit]);
+                    int danceDuration = nestQualities[siteToVisit] + round(get_noise());
+                    if (danceDuration <= 0)
+                    {
+                        danceDuration = 1;
+                    }
+                    setDanceState(1, danceDuration);
 
                     free(dancingBees);
                 }
             }
-
-            double probNotDancing = rand_hard() / 255.0;
-            if (probNotDancing <= 0.5 && nestQualities[nest.site] > 0)
-            {
-                setDanceState(1, nestQualities[nest.site]);
-            }
             else
             {
-                setDanceState(0, 0);
+                uint8_t siteToVisit = getSiteToVisit(beliefs);
+                setNestSite(siteToVisit, nestQualities[siteToVisit]);
+                int danceDuration = nestQualities[siteToVisit] + round(get_noise());
+                if (danceDuration <= 0)
+                {
+                    danceDuration = 1;
+                }
+                setDanceState(1, danceDuration);
             }
 
-            if (danceState.state == 1)
+            // double probNotDancing = rand_hard() / 255.0;
+            // if (probNotDancing <= 0.5)
+            // {
+            //     setDanceState(0, 0);
+            // }
+
+            if (isMalicious == 1)
             {
+                set_color(RGB(0, 2, 0));
+            }
+            else if (danceState.state == 1)
+            {
+                // Set colour to respective site
                 set_bot_colour(nest.site);
             }
             else
@@ -437,15 +412,37 @@ void loop()
             // Bee is dancing, so decrement dance duration.
             setDanceState(1, danceState.duration - 1);
 
+            // Random movement
+            switch(rand_hard() % 4)
+            {
+                case(0):
+                    set_motors(0,0);
+                    break;
+                case(1):
+                    //if (last_output == 0) spinup_motors();
+                    set_motors(kilo_turn_left,0); // 70
+                    break;
+                case(2):
+                    //if (last_output == 0) spinup_motors();
+                    set_motors(0,kilo_turn_right); // 70
+                    break;
+                case(3):
+                    //if (last_output == 0) spinup_motors();
+                    set_motors(kilo_straight_left, kilo_straight_right); // 65
+                    break;
+            }
+
             if (danceState.duration < 1)
             {
                 // Bee no longer dances
                 setDanceState(0, 0);
                 set_color(RGB(0, 0, 0));
+                set_motors(0,0);
             }
         }
 
         messageCount = 0;
+        loopCounter++;
     }
 }
 

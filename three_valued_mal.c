@@ -8,7 +8,7 @@
 #define MIN_DISTANCE 100
 
 #define BELIEF_BYTES 1
-#define BELIEF_PRECISION 1
+#define BELIEF_PRECISION 0
 
 // Individual variables for bots
 int updateTicks = 16; // 32 updates per second
@@ -17,6 +17,7 @@ int lastUpdate = -1;
 int messageCount = 0;
 int nestQualities[SITE_NUM] = {7, 9};
 int loopCounter = 0;
+int isMalicious = 0;
 
 uint8_t beliefs[SITE_NUM];
 int beliefStart = 2;
@@ -39,7 +40,7 @@ message_t msg;
 struct NestSite
 {
     uint8_t site;
-    uint8_t siteQuality;
+    uint8_t quality;
 };
 
 struct State
@@ -62,21 +63,79 @@ void setDanceState(uint8_t state, uint8_t duration)
 void setNestSite(uint8_t site, uint8_t quality)
 {
     nest.site = site;
-    nest.siteQuality = quality;
+    nest.quality = quality;
+}
+
+double bytesToDouble(uint8_t *msgData)
+{
+    uint32_t reformedBytes = 0;
+    int b = 0;
+    for (int i = 8 * (BELIEF_BYTES - 1); i >= 0; i -= 8)
+    {
+        reformedBytes += (*(msgData + b++) << i);
+    }
+
+    return (double) reformedBytes / pow(10, BELIEF_PRECISION);
+}
+
+void doubleToBytes(double belief, uint8_t *convertedBytes)
+{
+    uint32_t convertedBelief = (uint32_t) ((belief * pow(10, BELIEF_PRECISION)) + 0.5);
+    int b = 0;
+    for (int i = 8 * (BELIEF_BYTES - 1); i >= 0; i -= 8)
+    {
+        *(convertedBytes + b++) = (uint8_t) (convertedBelief >> i) & 0xFF;
+    }
+}
+
+void formConsistentBeliefs(uint8_t *beliefs)
+{
+    // Count the number of true propositions;
+    int trueCount = 0;
+    for (int b = 0; b < SITE_NUM; b++)
+    {
+        if (beliefs[b] == 2)
+        {
+            trueCount++;
+        }
+    }
+    // If greater than a single true value, convert to 1/2s.
+    if (trueCount > 1)
+    {
+        for (int b = 0; b < SITE_NUM; b++)
+        {
+            if (beliefs[b] == 2)
+            {
+                beliefs[b] = 1;
+            }
+        }
+    }
 }
 
 uint8_t getSiteToVisit(uint8_t *beliefs)
 {
     int siteToVisit = -1;
 
+    int borderlineProps[SITE_NUM];
+    int bCount = 0;
+
     for (int i = 0; i < SITE_NUM; i++)
+        borderlineProps[i] = -1;
+
+    // Count the number of borderline propositions
+    for (int b = 0; b < SITE_NUM; b++)
     {
-        if (beliefs[i] == 1)
+        if (beliefs[b] == 2)
+            return (uint8_t) b;
+        if (beliefs[b] == 1)
         {
-            siteToVisit = i;
-            break;
+            // Store site value and increase count
+            borderlineProps[bCount] = b;
+            bCount++;
         }
     }
+
+    siteToVisit = borderlineProps[rand_hard() % bCount];
 
     return (uint8_t) siteToVisit;
 }
@@ -225,12 +284,40 @@ void setup()
     // msg.type = NORMAL;
     // msg.crc = message_crc(&msg);
 
-    for (int b = 0; b < SITE_NUM; b++)
+    /*
+     * MALICIOUS AGENT DETERMINATION
+     */
+
+    if ((rand_hard() / 255.0) < 0.1)
     {
-        beliefs[b] = 0;
+        isMalicious = 1;
     }
 
-    beliefs[rand_hard() % SITE_NUM] = 1;
+    int zeroCount = SITE_NUM;
+    while (zeroCount == SITE_NUM)
+    {
+        zeroCount = 0;
+        for (int b = 0; b < SITE_NUM; b++)
+        {
+            uint8_t truthValue = (rand_hard() % 2);
+            if (truthValue == 1)
+                truthValue = 2;
+
+            beliefs[b] = truthValue;
+
+            if (beliefs[b] == 0)
+            {
+                zeroCount++;
+            }
+        }
+    }
+    //b std::cout << (int) beliefs[0] << ";" << (int) beliefs[1] << std::endl;
+    formConsistentBeliefs(beliefs);
+    // std::cout << (int) beliefs[0] << ";" << (int) beliefs[1] << std::endl;
+    // if (beliefs[0] == 2 && beliefs[1] == 2)
+    // {
+    //     std::cout << "NOT SUCCESSFUL" << std::endl;
+    // }
 
     uint8_t siteToVisit = getSiteToVisit(beliefs);
     setNestSite(siteToVisit, nestQualities[siteToVisit]);
@@ -263,7 +350,11 @@ void setup()
     msg.type = NORMAL;
     msg.crc = message_crc(&msg);
 
-    if (danceState.state == 1)
+    if (isMalicious == 1)
+    {
+        set_color(RGB(0, 2, 0));
+    }
+    else if (danceState.state == 1)
     {
         set_bot_colour(nest.site);
     }
@@ -280,8 +371,6 @@ void loop()
     {
         lastUpdate = kilo_ticks;
 
-        set_motors(0,0);
-
         // Dance state
         msg.data[0] = danceState.state;
         msg.data[1] = nest.site;
@@ -296,7 +385,34 @@ void loop()
 
         if (danceState.state == 0)
         {
-            if (messageCount > 0)
+            if (isMalicious == 1)
+            {
+                int zeroCount = SITE_NUM;
+                while (zeroCount == SITE_NUM)
+                {
+                    zeroCount = 0;
+                    for (int b = 0; b < SITE_NUM; b++)
+                    {
+                        uint8_t truthValue = (rand_soft() % 2);
+                        if (truthValue == 1)
+                            truthValue = 2;
+
+                        beliefs[b] = truthValue;
+
+                        if (beliefs[b] == 0)
+                        {
+                            zeroCount++;
+                        }
+                    }
+                }
+
+                formConsistentBeliefs(beliefs);
+
+                uint8_t siteToVisit = getSiteToVisit(beliefs);
+                setNestSite(siteToVisit, nestQualities[siteToVisit]);
+                setDanceState(1, nestQualities[siteToVisit]);
+            }
+            else if (messageCount > 0)
             {
                 int dancingBeeCount = 0;
                 for (int i = 0; i < messageCount; i++)
@@ -329,10 +445,9 @@ void loop()
 
                     uint8_t *otherBeliefs = &dancingBees[(rand_hard() % dancingBeeCount) * (SITE_NUM)];
 
-                    for (int i = 0; i < SITE_NUM; i++)
-                    {
-                        beliefs[i] = otherBeliefs[i];
-                    }
+                    consensus(beliefs, otherBeliefs);
+
+                    formConsistentBeliefs(beliefs);
 
                     uint8_t siteToVisit = getSiteToVisit(beliefs);
                     setNestSite(siteToVisit, nestQualities[siteToVisit]);
@@ -356,15 +471,19 @@ void loop()
                     danceDuration = 1;
                 }
                 setDanceState(1, danceDuration);
+
+                // double probNotDancing = rand_hard() / 255.0;
+                // if (probNotDancing <= 0.5)
+                // {
+                //     setDanceState(0, 0);
+                // }
             }
 
-            // double probNotDancing = rand_hard() / 255.0;
-            // if (probNotDancing <= 0.5)
-            // {
-            //     setDanceState(0, 0);
-            // }
-
-            if (danceState.state == 1)
+            if (isMalicious == 1)
+            {
+                set_color(RGB(0, 2, 0));
+            }
+            else if (danceState.state == 1)
             {
                 // Set colour to respective site
                 set_bot_colour(nest.site);
@@ -406,7 +525,6 @@ void loop()
                 // Bee no longer dances
                 setDanceState(0, 0);
                 set_color(RGB(0, 0, 0));
-                set_motors(0,0);
             }
         }
 
