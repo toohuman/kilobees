@@ -1,5 +1,5 @@
 # Kilobees
-Kilobot implementation of distributed consensus algorithms based partially on time-modulation for site-quality dissemination similar to honeybees.
+Kilobot implementation of distributed consensus algorithms based partially on time-modulation for site-quality dissemination similar to honeybees. The addition of a third truth state leads to improved robustness while retaining the same levels of accuracy as the standard Boolean version.
 
 # Overview
 This repository contains a collection of consensus algorithms developed originally for the Kilobox simulation environment for the Kilobots, before being rewritten in C for the Kilobots using the same Kilobot API. The repository includes Boolean and three-valued consensus algorithms presented at IROS 2017 (see [this](http://robohub.org/robust-distributed-decision-making-in-robot-swarms/) blog post for more details), as well as versions where a percentage of the population "malfunctions" by continuing to signal for a site at random. In this research we showed the following:
